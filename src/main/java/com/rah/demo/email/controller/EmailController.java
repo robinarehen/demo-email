@@ -35,7 +35,24 @@ public class EmailController {
 	public String enviarHtml(@RequestParam String destino, String asunto) {
 
 		// 1. Crear un diseño HTML sencillo usando estilos en línea (Inline CSS)
-		String cuerpoHtml = """
+		// String cuerpoHtml = createHtmlBody();
+
+		// 2. Crear un archivo temporal simulado para adjuntar (.txt o .pdf simulado)
+		File archivoTemp = this.createFile();
+		
+		// 3 . Crear una imagen temporal simulada para agregar en el HTML
+		// byte[] image = this.createImage();
+
+		// 4. Enviar el correo usando el nuevo método
+		emailService.enviarCorreoHtml(destino, asunto, this.createHtmlBody(), archivoTemp, this.createImage());
+
+		this.deleteFile(archivoTemp);
+
+		return "Correo HTML con adjunto enviado con éxito a: " + destino;
+	}
+
+	private String createHtmlBody() {
+		return """
 				<html>
 				    <body style="font-family: Arial, sans-serif; color: #333;">
 				        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
@@ -50,16 +67,6 @@ public class EmailController {
 				    </body>
 				</html>
 				""";
-
-		// 2. Crear un archivo temporal simulado para adjuntar (.txt o .pdf simulado)
-		File archivoTemp = this.createFile();
-
-		// 3. Enviar el correo usando el nuevo método
-		emailService.enviarCorreoHtml(destino, asunto, cuerpoHtml, archivoTemp, this.createImage());
-
-		this.deleteFile(archivoTemp);
-
-		return "Correo HTML con adjunto enviado con éxito a: " + destino;
 	}
 
 	private byte[] createImage() {
@@ -73,14 +80,12 @@ public class EmailController {
 		try {
 			ImageIO.write(bufferedImage, "png", baos);
 
-//			return baos.toByteArray();
+			return baos.toByteArray();
 
 		} catch (IOException exception) {
 			exception.printStackTrace();
 			throw new RuntimeException("Error al generar la imagen: " + exception.getMessage());
 		}
-
-		return null;
 	}
 
 	private File createFile() {
@@ -91,14 +96,12 @@ public class EmailController {
 				writer.write("Contenido confidencial del reporte generado por el sistema.");
 			}
 
-//			return archivoTemp;
+			return archivoTemp;
 
 		} catch (IOException exception) {
 			exception.printStackTrace();
 			throw new RuntimeException("Error al generar el archivo: " + exception.getMessage());
 		}
-
-		return null;
 	}
 
 	private void deleteFile(File archivoTemp) {
