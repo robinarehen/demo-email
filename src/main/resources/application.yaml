@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: demo-email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+#    port: 465
+    username: sneyt04@gmail.com
+    password: ${GOOGLE_APP_EMAIL_SECRET}
+    properties:
+      mail:
+        smtp:
+          auth: true
+# Se debe habilitar si se usa el puerto 465
+#          ssl:
+#            enable: true
+# Se debe habilitar si se usa el puerto 587
+          starttls:
+            enable: true
