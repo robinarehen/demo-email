@@ -1,6 +1,7 @@
 package com.rah.demo.email.service;
 
 import java.io.File;
+import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -67,6 +68,42 @@ public class EmailService {
 			}
 
 			// 6. Enviar el correo
+			mailSender.send(mensaje);
+
+		} catch (MessagingException exception) {
+			exception.printStackTrace();
+			throw new RuntimeException("Error al procesar el envío: " + exception.getMessage());
+		}
+	}
+	
+
+	public void enviarCorreoHtml(String para, String asunto, String cuerpoHtml, String qrImage) {
+		try {
+			// 1. Crear el mensaje Mime base
+			MimeMessage mensaje = mailSender.createMimeMessage();
+
+			// 2. Usar el Helper con el flag 'true' para activar contenido multipart (HTML y
+			// adjuntos)
+			MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
+
+			helper.setFrom(this.usernameEmail);
+			helper.setTo(para);
+			helper.setSubject(asunto);
+
+			// 3. Definir el cuerpo. El segundo parámetro 'true' le dice a Spring que es
+			// código HTML
+			helper.setText(cuerpoHtml, true);
+
+			// 6. Agregar imagen del QR usando su identificador CID
+			byte[] qrBytes = Base64.getDecoder().decode(qrImage);
+			if (qrBytes != null && qrBytes.length > 0) {
+				ByteArrayResource qrResource = new ByteArrayResource(qrBytes);
+				// El identificador "codigoQR" debe coincidir exactamente con el cid:codigoQR
+				// del HTML
+				helper.addInline("codigoQR", qrResource, "image/png");
+			}
+
+			// 5. Enviar el correo
 			mailSender.send(mensaje);
 
 		} catch (MessagingException exception) {
