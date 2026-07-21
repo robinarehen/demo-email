@@ -1,6 +1,5 @@
 server:
   port: 8082
-  forward-headers-strategy: framework
 
 spring:
   application:
@@ -24,4 +23,4 @@ spring:
 
 # Variables de entorno
 gateway:
-  secret: ${X-GATEWAY-SECRET:crearVariableEntorno}
+  secret: ${X_GATEWAY_SECRET}
