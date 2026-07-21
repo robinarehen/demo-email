@@ -32,9 +32,11 @@ public class EmailController {
 	@GetMapping("/enviar-test")
 	public String enviarTest(@RequestParam String destino, @RequestHeader HttpHeaders headers) {
 		String gatewaySecret = headers.getFirst("X-GATEWAY-SECRET");
-//		emailService.enviarCorreoSimple(destino, "Prueba de Spring Boot 3.5",
-//				"¡Hola! Este es un correo de prueba usando Java 21 y Spring Boot.");
-		return "Correo enviado con éxito a: " + destino + " :: gateway secret: " + gatewaySecret;
+		
+		emailService.enviarCorreoSimple(destino, "Prueba de Spring Boot 3.5",
+				"¡Hola! Este es un correo de prueba usando Java 21 y Spring Boot.");
+
+		return "Correo enviado con éxito a: %s :: gateway secret: %s".formatted(destino, gatewaySecret);
 	}
 
 	@GetMapping("/enviar-html")

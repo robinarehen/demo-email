@@ -1,5 +1,7 @@
 package com.rah.demo.email.config;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -11,31 +13,36 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class HandlerInterceptorConfig implements HandlerInterceptor {
 
-	@Value("${X-GATEWAY-SECRET}")
-	private String xGatewaySecret;
+	@Value("${gateway.secret}")
+	private String gatewaySecret;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		String gatewaySecret = request.getHeader("X-GATEWAY-SECRET");
-		if (this.xGatewaySecret.equals(gatewaySecret)) {
+
+		if (this.gatewaySecret.equals(gatewaySecret)) {
 			return true;
 		}
 
+		this.setErrorMessage(response);
+
+		return false;
+	}
+
+	void setErrorMessage(HttpServletResponse response) throws IOException {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
 		String jsonError = """
 				{
 				    "error": "Unauthorized",
-				    "mensaje": "Petición no permitidad.",
+				    "mensaje": "Petición no permitida.",
 				    "status": 401
 				}
 				""";
 
 		response.getWriter().write(jsonError);
-
-		return false;
 	}
 
 }

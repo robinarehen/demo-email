@@ -1,5 +1,6 @@
 server:
   port: 8082
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -14,9 +15,13 @@ spring:
       mail:
         smtp:
           auth: true
-# Se debe habilitar si se usa el puerto 465
+# Se debe habilitar si se usa el puerto {spring.mail.port:465}
 #          ssl:
 #            enable: true
-# Se debe habilitar si se usa el puerto 587
+# Se debe habilitar si se usa el puerto {spring.mail.port:587}
           starttls:
             enable: true
+
+# Variables de entorno
+gateway:
+  secret: ${X-GATEWAY-SECRET:crearVariableEntorno}
