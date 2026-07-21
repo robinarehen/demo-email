@@ -35,11 +35,16 @@ jobs:
 
     # 4. Análisis de Calidad del Código con Sonar Cloud / SonarQube
     # Requiere que configures SONAR_TOKEN y SONAR_HOST_URL (si usas On-Premise) en los Secrets de GitHub
-#    - name: Analizar Calidad de Código (Sonar)
-#      env:
-#        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Opcional si usas SonarCloud
-#      run: mvn sonar:sonar
+    - name: Analizar Calidad de Código (Sonar)
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_PROJECT_KEY: ${{ github.repository_owner }}_${{ github.event.repository.name }}
+      run: |
+        mvn -B sonar:sonar \
+        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+        -Dsonar.projectName=${{ github.event.repository.name }} \
+        -Dsonar.organization=${{ github.repository_owner }} \
+        -Dsonar.host.url=https://sonarcloud.io
 
     # 5. Generar y Subir informe CycloneDX BOM a Dependency-Track
     # Este paso genera el archivo de dependencias (BOM) y lo envía a tu servidor de Dependency-Track
