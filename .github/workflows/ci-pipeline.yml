@@ -1,5 +1,7 @@
 name: Java CI Pipeline con Sonar y Dependency-Track
 
+run-name: Build ${{ github.run_number }} - lanzado por ${{ github.actor }} - en ${{ github.ref_name }}
+
 on:
   push:
     branches: [ main, develop ]
@@ -8,6 +10,7 @@ on:
 
 jobs:
   build-and-analyze:
+    name: 🚀 Compilar, Testear y Analizar Calidad de Código
     runs-on: ubuntu-latest
 
     steps:
