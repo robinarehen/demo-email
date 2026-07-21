@@ -45,6 +45,7 @@ jobs:
         -Dsonar.projectName=${{ github.event.repository.name }} \
         -Dsonar.organization=${{ github.repository_owner }} \
         -Dsonar.branch.name=${{ github.ref_name }} \
+        -Dsonar.scm.provider=git \
         -Dsonar.host.url=https://sonarcloud.io
 
     # 5. Generar y Subir informe CycloneDX BOM a Dependency-Track
