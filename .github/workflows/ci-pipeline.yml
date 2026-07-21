@@ -1,0 +1,57 @@
+name: Java CI Pipeline con Sonar y Dependency-Track
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Descargar el código del repositorio
+    - name: Checkout del código
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Es crucial para que SonarQube analice el historial de Git correctamente
+
+    # 2. Configurar el entorno de Java 21
+    - name: Configurar Java 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'maven' # Almacena las dependencias en caché para acelerar futuras ejecuciones
+
+    # 3. Compilar y ejecutar Tests Unitarios / Integración
+    # Si algún test falla, el comando devuelve un error y detiene el flujo de inmediato.
+    - name: Compilar y Validar Tests
+      run: mvn clean verify
+
+    # 4. Análisis de Calidad del Código con Sonar Cloud / SonarQube
+    # Requiere que configures SONAR_TOKEN y SONAR_HOST_URL (si usas On-Premise) en los Secrets de GitHub
+#    - name: Analizar Calidad de Código (Sonar)
+#      env:
+#        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Opcional si usas SonarCloud
+#      run: mvn sonar:sonar
+
+    # 5. Generar y Subir informe CycloneDX BOM a Dependency-Track
+    # Este paso genera el archivo de dependencias (BOM) y lo envía a tu servidor de Dependency-Track
+#    - name: Generar e Intercambiar SBOM (Dependency-Track)
+#      env:
+#        DEPENDENCY_TRACK_API_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+#        DEPENDENCY_TRACK_URL: "https://tu-servidor-dependency-track.com"
+#        PROJECT_UUID: "tu-uuid-de-proyecto-en-dependency-track"
+#      run: |
+#        # Genera el reporte usando el plugin de CycloneDX para Maven
+#        mvn cyclonedx:makeAggregateBom
+#        
+#        # Sube el archivo generado (target/bom.json) usando cURL a la API de Dependency-Track
+#        curl -X "POST" "$DEPENDENCY_TRACK_URL/api/v1/bom" \
+#             -H "X-Api-Key: $DEPENDENCY_TRACK_API_KEY" \
+#             -H "Content-Type: multipart/form-data" \
+#             -F "project=$PROJECT_UUID" \
+#             -F "bom=@target/bom.json"
