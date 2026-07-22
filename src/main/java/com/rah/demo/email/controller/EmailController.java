@@ -70,6 +70,11 @@ public class EmailController {
 
 		return "Se ha enviado un Correo con indicaciones para activar el segundo factor. a: " + emailDto.destino();
 	}
+	
+	@GetMapping("/sonar")
+	public String demoSonar() {
+		return "Sonar cloud";
+	}
 
 	private String createHtmlBody() {
 		return """

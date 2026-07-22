@@ -33,39 +33,18 @@ jobs:
     - name: Compilar y Validar Tests
       run: mvn clean verify
 
-#    - name: Crear proyecto en SonarCloud si no existe
-#      env:
-#        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
-#        SONAR_PROJECT_KEY: ${{ vars.SONAR_ORGANIZATION }}_${{ github.event.repository.name }}
-#        SONAR_PROJECT_NAME: ${{ github.event.repository.name }}
-#      run: |
-#        echo "Creando proyecto en SonarCloud (si no existe)..."
-#        curl -X POST "https://sonarcloud.io/api/projects/create" \
-#          -u "$SONAR_TOKEN:" \
-#          -d "organization=$SONAR_ORGANIZATION" \
-#          -d "project=$SONAR_PROJECT_KEY" \
-#          -d "name=$SONAR_PROJECT_NAME" || echo "El proyecto ya existe"
-
     # 4. Análisis de Calidad del Código con Sonar Cloud / SonarQube
     - name: Analizar Calidad de Código (Sonar)
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
         SONAR_PROJECT_KEY: ${{ vars.SONAR_ORGANIZATION }}_${{ github.event.repository.name }}
-        SONAR_PROJECT_NAME: ${{ github.event.repository.name }}
-        SONAR_BRANCH: ${{ github.ref_name }}
       run: |
         mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
         -Dsonar.host.url=https://sonarcloud.io \
         -Dsonar.token=$SONAR_TOKEN \
         -Dsonar.organization=$SONAR_ORGANIZATION \
-        -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-        -Dsonar.projectName=$SONAR_PROJECT_NAME \
-        -Dsonar.branch.name=$SONAR_BRANCH
-#        -Dsonar.scm.disabled=true \
-#        -Dsonar.scm.revision=$SONAR_BRANCH
+        -Dsonar.projectKey=$SONAR_PROJECT_KEY
 
     # 5. Generar y Subir informe CycloneDX BOM a Dependency-Track
     # Este paso genera el archivo de dependencias (BOM) y lo envía a tu servidor de Dependency-Track
