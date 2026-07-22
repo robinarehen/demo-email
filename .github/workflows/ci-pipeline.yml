@@ -5,8 +5,8 @@ run-name: Build ${{ github.run_number }} - lanzado por ${{ github.actor }} - en 
 on:
   push:
     branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+#  pull_request:
+#    branches: [ main, develop ]
 
 jobs:
   build-and-analyze:
@@ -47,17 +47,6 @@ jobs:
           -d "project=$SONAR_PROJECT_KEY" \
           -d "name=$SONAR_PROJECT_NAME" || echo "El proyecto ya existe"
 
-#    - name: Hacer el proyecto público en SonarCloud
-#      env:
-#        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        SONAR_PROJECT_KEY: ${{ vars.SONAR_ORGANIZATION }}_${{ github.event.repository.name }}
-#      run: |
-#        echo "Actualizando visibilidad del proyecto a público..."
-#        curl -X POST "https://sonarcloud.io/api/projects/update_visibility" \
-#          -u "$SONAR_TOKEN:" \
-#          -d "project=$SONAR_PROJECT_KEY" \
-#          -d "visibility=public"
-
     # 4. Análisis de Calidad del Código con Sonar Cloud / SonarQube
     # Requiere que configures SONAR_TOKEN y SONAR_HOST_URL (si usas On-Premise) en los Secrets de GitHub
     - name: Analizar Calidad de Código (Sonar)
@@ -65,15 +54,15 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
         SONAR_PROJECT_KEY: ${{ vars.SONAR_ORGANIZATION }}_${{ github.event.repository.name }}
-#        SONAR_BRANCH: ${{ github.ref_name }}
+        SONAR_BRANCH: ${{ github.ref_name }}
       run: |
         mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
         -Dsonar.host.url=https://sonarcloud.io \
         -Dsonar.token=$SONAR_TOKEN \
         -Dsonar.organization=$SONAR_ORGANIZATION \
         -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-#        -Dsonar.scm.disabled=true \
-#        -Dsonar.scm.revision=$SONAR_BRANCH
+        -Dsonar.scm.disabled=true \
+        -Dsonar.scm.revision=$SONAR_BRANCH
 
     # 5. Generar y Subir informe CycloneDX BOM a Dependency-Track
     # Este paso genera el archivo de dependencias (BOM) y lo envía a tu servidor de Dependency-Track
